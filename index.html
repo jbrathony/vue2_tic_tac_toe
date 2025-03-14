@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vue Tic Tac Toe</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <style>
+        #app {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px auto;
+            width: 310px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            font-size: 2em;
+            text-align: center;
+            line-height: 100px;
+            border: 2px solid #333;
+            cursor: pointer;
+        }
+        .cell.disabled {
+            pointer-events: none;
+            color: gray;
+        }
+        .winner {
+            font-size: 1.5em;
+            margin: 10px 0;
+            color: green;
+        }
+        .reset-btn {
+            margin-top: 10px;
+            padding: 8px 15px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Vue Tic Tac Toe</h1>
+        <div v-if="winner" class="winner">{{ winner }} wins!</div>
+        <div class="board">
+            <div v-for="(cell, index) in board" 
+                 :key="index" 
+                 class="cell" 
+                 :class="{ disabled: cell }"
+                 @click="makeMove(index)">
+                {{ cell }}
+            </div>
+        </div>
+        <button class="reset-btn" @click="resetBoard">Reset Game</button>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                board: Array(9).fill(""),
+                currentPlayer: "X",
+                winner: null
+            },
+            methods: {
+                makeMove(index) {
+                    if (!this.board[index] && !this.winner) {
+                        this.$set(this.board, index, this.currentPlayer);
+                        if (this.checkWinner()) {
+                            this.winner = this.currentPlayer;
+                        } else {
+                            this.currentPlayer = this.currentPlayer === "X" ? "O" : "X";
+                        }
+                    }
+                },
+                checkWinner() {
+                    const winningPatterns = [
+                        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+                        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+                        [0, 4, 8], [2, 4, 6]  // Diagonals
+                    ];
+                    return winningPatterns.some(pattern => {
+                        const [a, b, c] = pattern;
+                        return this.board[a] && this.board[a] === this.board[b] && this.board[a] === this.board[c];
+                    });
+                },
+                resetBoard() {
+                    this.board = Array(9).fill("");
+                    this.currentPlayer = "X";
+                    this.winner = null;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
